@@ -6,7 +6,9 @@ import io.restassured.response.Response;
  * @author Vinod Kris
  */
 
-// Base class for all stepdefs
+/*
+    Base class for sharing objects across stepdefs
+ */
 
 public class TestBase {
 
