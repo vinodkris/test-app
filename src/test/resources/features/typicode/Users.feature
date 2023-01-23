@@ -15,7 +15,7 @@ Feature: users endpoint
     Given The endpoint for users exist
     When I call the endpoint to create users
     Then The endpoint should return status of 201
-    And The user should be successfully created
+    And  The user should be successfully created
 
   @put
   Scenario: Update User
@@ -33,8 +33,10 @@ Feature: users endpoint
     Then The endpoint should return status of 200
     And the body should have updated user information
     Examples:
-      | fieldToChane | value        |
-      | username         | new_name |
+      | fieldToChane | value             |
+      | username         | new_name      |
+      | email            | new@email.com |
+      | phone            | +441234567890 |
 
   @delete
   Scenario: Delete User
@@ -45,9 +47,16 @@ Feature: users endpoint
 
 
   @noheader @negative
-  Scenario: Create User with no header
+  Scenario: Create User with no header in request
     Given The endpoint for users exist
     When I call the endpoint to create user with no header
+    Then The endpoint should return status of 201
+    And The user should be successfully created with no body but Id
+
+  @noBody @negative
+  Scenario: Create User with no body in request
+    Given The endpoint for users exist
+    When I call the endpoint to create user with no body
     Then The endpoint should return status of 201
     And The user should be successfully created with no body but Id
 

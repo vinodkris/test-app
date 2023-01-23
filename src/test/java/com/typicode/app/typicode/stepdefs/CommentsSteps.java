@@ -2,7 +2,6 @@ package com.typicode.app.typicode.stepdefs;
 
 import com.typicode.app.typicode.base.TestBase;
 import com.typicode.app.typicode.msgType.Comments;
-import com.typicode.app.typicode.msgType.Post;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -10,10 +9,10 @@ import io.restassured.RestAssured;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.typicode.app.typicode.helper.TypicodeHelper.buildPost;
-import static com.typicode.app.typicode.helper.TypicodeHelper.updateComment;
+import static com.typicode.app.typicode.helper.TypicodeHelper.*;
+import static com.typicode.app.typicode.helper.TypicodeHelper.getJsonNodeFromType;
 import static com.typicode.app.typicode.utils.Constants.BASE_URL;
-import static com.typicode.app.typicode.utils.Constants.EMPTY_JSON;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -48,19 +47,21 @@ public class CommentsSteps {
         assertTrue("No Comments returned",!comments.isEmpty());
     }
 
-    @When("I call the endpoint to post comments with {string} {string} {string} {string}")
-    public void i_call_the_endpoint_to_post_comments_with(String postId, String name, String email, String body) {
+    @When("I call the endpoint to post comments with {int} {string} {string} {string}")
+    public void i_call_the_endpoint_to_post_comments_with(int postId, String name, String email, String body) {
         Comments comment = new Comments(postId,name,email,body);
         testBase.response = RestAssured.given()
                 .header("Content-Type", "application/json")
                 .body(comment)
                 .post(COMMENTS_URL);
     }
-    @Then("The comment should be successfully posted with {string} {string} {string} {string}")
-    public void the_comment_should_be_successfully_posted_with(String postId, String name, String email, String body) {
+    @Then("The comment should be successfully posted with {int} {string} {string} {string}")
+    public void the_comment_should_be_successfully_posted_with(int postId, String name, String email, String body) {
         Comments comments = testBase.response.getBody().as(Comments.class);
         Comments expectedComment = new Comments(postId,name,email,body);
-        verifyComments(expectedComment,comments);
+        System.out.println("SETTING ID OF EXPECTED COMMENT TO MATCH THE ACTUAL ONE");
+        expectedComment.setId(comments.getId());
+        assertEquals(getJsonNodeFromType(expectedComment), getJsonNodeFromType(comments));
     }
 
     @Given("For an existing comment")
@@ -72,8 +73,8 @@ public class CommentsSteps {
         existingComment = comments.get(0);
     }
 
-    @When("I update the comment with {string} {string} {string} {string}")
-    public void i_update_the_comment_with(String postId, String name, String email, String body) {
+    @When("I update the comment with {int} {string} {string} {string}")
+    public void i_update_the_comment_with(int postId, String name, String email, String body) {
         comment = new Comments(postId,name,email,body);
         comment.setId(existingComment.getId());
         testBase.response = RestAssured.given()
@@ -85,10 +86,7 @@ public class CommentsSteps {
     @When("I partially update the comment with {string} {string}")
     public void i_partially_update_the_comment_with(String fieldToChange, String value) {
 
-        String jsonBody = "{\n" +
-                "\t\"" + fieldToChange + "\" : \"" + value + "\"\n" +
-                "\t\n" +
-                "}";
+        String jsonBody = buildJsonStringWithGivenField(fieldToChange,value);
 
         comment = updateComment(existingComment,fieldToChange,value);
         testBase.response = RestAssured.given()
@@ -102,7 +100,7 @@ public class CommentsSteps {
     public void the_body_should_have_updated_information() {
 
         Comments updatedComment = testBase.response.getBody().as(Comments.class);
-        verifyComments(comment,updatedComment);
+        assertEquals(getJsonNodeFromType(comment), getJsonNodeFromType(updatedComment));
 
     }
 
@@ -120,31 +118,29 @@ public class CommentsSteps {
 
     @When("I call the endpoint to create comment with no header")
     public void i_call_the_endpoint_to_create_comment_with_no_header() {
-        Comments commentWithNoHeader = new Comments("1","test","test@a.com","Negative test with no header");
+        Comments commentWithNoHeader = new Comments(1,"test","test@a.com","Negative test with no header");
         testBase.response = RestAssured.given()
                 .body(commentWithNoHeader)
                 .post(COMMENTS_URL);
     }
+
+    @When("I call the endpoint to create comment with no body")
+    public void i_call_the_endpoint_to_create_comment_with_no_body() {
+        testBase.response = RestAssured.given()
+                .header("Content-Type", "application/json")
+                .post(COMMENTS_URL);
+    }
+
     @Then("The comment should be successfully created with no body but Id")
     public void the_comment_should_be_successfully_created_with_no_body_but_id() {
 
         Comments withNoBody = testBase.response.body()
                 .as(Comments.class);
         assertTrue("",withNoBody.getBody() == null);
-        assertTrue("",withNoBody.getPostId() == null);
+        assertTrue("",withNoBody.getPostId() == 0);
         assertTrue("",withNoBody.getEmail() == null);
         assertTrue("",withNoBody.getName() == null);
         assertTrue("",withNoBody.getId() != 0);
-
-    }
-
-    private void verifyComments(Comments expectedComment, Comments actualComments){
-
-        assertTrue("PostId doesnt match",expectedComment.getPostId().equalsIgnoreCase(actualComments.getPostId()));
-        assertTrue("Response name doesnt match",expectedComment.getName().equalsIgnoreCase(actualComments.getName()));
-        assertTrue("Response email doesnt match",expectedComment.getEmail().equalsIgnoreCase(actualComments.getEmail()));
-        assertTrue("Response body doesnt match",expectedComment.getBody().equalsIgnoreCase(actualComments.getBody()));
-        assertTrue("Id is null",Integer.valueOf(actualComments.getId()) != null);
 
     }
 

@@ -13,21 +13,20 @@ Feature: posts endpoint
   @post
   Scenario Outline: Create Post
     Given The endpoint for post exist
-    When I call the endpoint to create post with "<userId>" "<title>" "<body>"
+    When I call the endpoint to create post with <userId> "<title>" "<body>"
     Then The endpoint should return status of 201
-    And The post should be successfully created with "<userId>" "<title>" "<body>"
+    And The post should be successfully created with <userId> "<title>" "<body>"
       Examples:
         | userId | title                 | body        |
         | 1      | Sundays are relaxing! | Relaxing    |
-        | 2A     | Cold Week             | Freezing... |
-        |        | Cold Week             | Freezing... |
-        |        |                       |             |
+        | 2      |                        | Freezing... |
+        | -3     | Cold Week             |             |
 
   @put
   Scenario Outline: Update Posts
     Given The endpoint for post exist
     And For an existing post
-    When I update the post with "<userId>" "<title>" "<body>"
+    When I update the post with <userId> "<title>" "<body>"
     Then The endpoint should return status of 200
     And the body should have updated post information
     Examples:
@@ -44,6 +43,7 @@ Feature: posts endpoint
     Examples:
       | fieldToChane | value          |
       | name         | test 02        |
+      | userId       |   10           |
 
   @delete
   Scenario: Delete Posts
@@ -53,8 +53,15 @@ Feature: posts endpoint
     And I should see an empty body returned by the endpoint
 
   @noheader @negative
-  Scenario: Create Post with no header
+  Scenario: Create Post with no header in request
     Given The endpoint for post exist
     When I call the endpoint to create post with no header
+    Then The endpoint should return status of 201
+    And The post should be successfully created with no body but Id
+
+  @noBody @negative
+  Scenario: Create Post with no body in request
+    Given The endpoint for post exist
+    When I call the endpoint to create post with no body
     Then The endpoint should return status of 201
     And The post should be successfully created with no body but Id

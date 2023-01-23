@@ -8,13 +8,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
-import io.restassured.specification.RequestSpecification;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.typicode.app.typicode.helper.TypicodeHelper.*;
 import static com.typicode.app.typicode.utils.Constants.BASE_URL;
-import static io.restassured.RestAssured.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -73,7 +71,9 @@ public class UsersSteps {
     @Then("The user should be successfully created")
     public void the_user_should_be_successfully_created() {
         User actualUser = testBase.response.getBody().as(User.class);
-        assertEquals("",user.getUsername(),actualUser.getUsername());
+        System.out.println("SETTING ID OF EXPECTED USER TO MATCH THE ACTUAL ONE");
+        user.setId(actualUser.getId());
+        assertEquals(getJsonNodeFromType(user), getJsonNodeFromType(actualUser));
     }
 
     @Given("For an existing user")
@@ -99,17 +99,13 @@ public class UsersSteps {
     @When("I partially update the user with {string} {string}")
     public void i_partially_update_the_user_with(String fieldToChange, String value) {
 
-        String jsonBody = "{\n" +
-                "\t\"" + fieldToChange + "\" : \"" + value + "\"\n" +
-                "\t\n" +
-                "}";
+        String jsonBody = buildJsonStringWithGivenField(fieldToChange,value);
 
         user = updateUser(existingUser,fieldToChange,value);
         testBase.response = RestAssured.given()
                 .header("Content-Type", "application/json")
                 .body(jsonBody)
                 .patch(USERS_URL + "/" + existingUser.getId());
-        System.out.println(testBase.response.getBody().asPrettyString());
 
     }
 
@@ -129,18 +125,25 @@ public class UsersSteps {
     public void the_body_should_have_updated_user_information() {
 
         User updatedUser = testBase.response.getBody().as(User.class);
-        verifyUser(user,updatedUser);
+        assertEquals(getJsonNodeFromType(user), getJsonNodeFromType(updatedUser));
 
     }
 
     @When("I call the endpoint to create user with no header")
-    public void i_call_the_endpoint_to_create_user() {
+    public void i_call_the_endpoint_to_create_user_no_header() {
         User userWithNoHeader = new User("New test user","updated_tester","test@001.com",
                 "1234567890","www.test123.com",
                 address,company);
 
         testBase.response = RestAssured.given()
                 .body(userWithNoHeader)
+                .post(USERS_URL);
+    }
+
+    @When("I call the endpoint to create user with no body")
+    public void i_call_the_endpoint_to_create_no_body() {
+        testBase.response = RestAssured.given()
+                .header("Content-Type", "application/json")
                 .post(USERS_URL);
     }
 
@@ -153,11 +156,5 @@ public class UsersSteps {
         assertTrue("",withNoBody.getAddress() == null);
         assertTrue("",withNoBody.getId() != 0);
     }
-
-    private void verifyUser(User expectedUser, User actualUser){
-
-        assertEquals(expectedUser.getUsername(),actualUser.getUsername());
-    }
-
 
 }

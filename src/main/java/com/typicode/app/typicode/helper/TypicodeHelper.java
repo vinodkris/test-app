@@ -1,15 +1,20 @@
 package com.typicode.app.typicode.helper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typicode.app.typicode.msgType.Comments;
 import com.typicode.app.typicode.msgType.Post;
 import com.typicode.app.typicode.msgType.User;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Vinod Kris
  */
 public class TypicodeHelper {
 
-    public static Post buildPost(String userId, String title, String body){
+    public static Post buildPost(int userId, String title, String body){
 
         return new Post(title,body,userId);
     }
@@ -21,7 +26,7 @@ public class TypicodeHelper {
                 comments.setName(value);
                 break;
             case "postId":
-                comments.setPostId(value);
+                comments.setPostId(Integer.parseInt(value));
                 break;
             case "email":
                 comments.setEmail(value);
@@ -40,7 +45,7 @@ public class TypicodeHelper {
 
         switch(fieldToChange) {
             case "userId":
-                post.setUserId(value);
+                post.setUserId(Integer.parseInt(value));
                 break;
             case "title":
                 post.setTitle(value);
@@ -76,6 +81,34 @@ public class TypicodeHelper {
                 break;
         }
         return user;
+    }
+
+    /*
+        Genaric method to get JsonNode from an object-type.
+        Can be used across User,Comments and Posts data type
+     */
+    public static <T> JsonNode getJsonNodeFromType(T expected){
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode=null;
+        try {
+
+            jsonNode = mapper.readTree(mapper.writeValueAsString(expected));
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return jsonNode;
+    }
+
+    public static String buildJsonStringWithGivenField(String fieldName, String fieldValuee){
+
+        return  "{\n" +
+                "\t\"" + fieldName + "\" : \"" + fieldValuee + "\"\n" +
+                "\t\n" +
+                "}";
+
     }
 
 }

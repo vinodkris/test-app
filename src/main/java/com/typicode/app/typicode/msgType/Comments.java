@@ -5,7 +5,7 @@ package com.typicode.app.typicode.msgType;
  */
 public class Comments {
 
-    private String postId;
+    private int postId;
     private int id;
     private String name;
     private String email;
@@ -13,18 +13,18 @@ public class Comments {
 
     public Comments() {}
 
-    public Comments(String postId, String name, String email, String body) {
+    public Comments(int postId, String name, String email, String body) {
         this.postId = postId;
         this.name = name;
         this.email = email;
         this.body = body;
     }
 
-    public String getPostId() {
+    public int getPostId() {
         return postId;
     }
 
-    public void setPostId(String postId) {
+    public void setPostId(int postId) {
         this.postId = postId;
     }
 

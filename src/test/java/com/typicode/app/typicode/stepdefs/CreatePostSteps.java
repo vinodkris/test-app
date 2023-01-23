@@ -48,15 +48,22 @@ public class CreatePostSteps {
     }
 
     @When("I call the endpoint to create post with no header")
-    public void i_call_the_endpoint_to_create_post() {
-        Post post = buildPost("1","No Header","Test For No Header");
+    public void i_call_the_endpoint_to_create_post_no_header() {
+        Post post = buildPost(1,"No Header","Test For No Header");
         testBase.response = RestAssured.given()
                 .body(post)
                 .post(POST_URL);
     }
 
-    @When("I call the endpoint to create post with {string} {string} {string}")
-    public void i_call_the_endpoint_to_create_post_with(String userId, String title, String body) {
+    @When("I call the endpoint to create post with no body")
+    public void i_call_the_endpoint_to_create_post_no_body() {
+        testBase.response = RestAssured.given()
+                .contentType("application/json")
+                .post(POST_URL);
+    }
+
+    @When("I call the endpoint to create post with {int} {string} {string}")
+    public void i_call_the_endpoint_to_create_post_with(int userId, String title, String body) {
         Post post = buildPost(userId,title,body);
         testBase.response = RestAssured.given()
                 .header("Content-Type", "application/json")
@@ -64,13 +71,13 @@ public class CreatePostSteps {
                 .post(POST_URL);
     }
 
-    @Then("The post should be successfully created with {string} {string} {string}")
-    public void the_post_should_be_successfully_created_with(String userId, String title, String body) {
+    @Then("The post should be successfully created with {int} {string} {string}")
+    public void the_post_should_be_successfully_created_with(int userId, String title, String body) {
+        Post expectedPost = new Post(title,body,userId);
         Post post = testBase.response.getBody().as(Post.class);
-        assertTrue("Response userId doesnt match",post.getUserId().equalsIgnoreCase(userId));
-        assertTrue("Response title doesnt match",post.getTitle().equalsIgnoreCase(title));
-        assertTrue("Response body doesnt match",post.getBody().equalsIgnoreCase(body));
-        assertTrue("Id is null",Integer.valueOf(post.getId()) != null);
+        System.out.println("SETTING ID OF EXPECTED POST TO MATCH THE ACTUAL ONE");
+        expectedPost.setId(post.getId());
+        assertEquals(getJsonNodeFromType(expectedPost), getJsonNodeFromType(post));
     }
 
     @And("The post should be successfully created with no body but Id")
@@ -79,7 +86,7 @@ public class CreatePostSteps {
                 .as(Post.class);
         assertTrue("",withNoBody.getBody() == null);
         assertTrue("",withNoBody.getTitle() == null);
-        assertTrue("",withNoBody.getUserId() == null);
+        assertTrue("",withNoBody.getUserId() == 0);
         assertTrue("",withNoBody.getId() != 0);
     }
 
@@ -92,8 +99,8 @@ public class CreatePostSteps {
         existingPost = posts.get(0);
     }
 
-    @When("I update the post with {string} {string} {string}")
-    public void i_update_the_post_with(String title, String body, String userId) {
+    @When("I update the post with {int} {string} {string}")
+    public void i_update_the_post_with(int userId, String title, String body) {
         post = new Post(title,body,userId);
         post.setId(existingPost.getId());
         testBase.response = RestAssured.given()
@@ -105,10 +112,7 @@ public class CreatePostSteps {
     @When("I partially update the post with {string} {string}")
     public void i_partially_update_the_post_with(String fieldToChange, String value) {
 
-        String jsonBody = "{\n" +
-                "\t\"" + fieldToChange + "\" : \"" + value + "\"\n" +
-                "\t\n" +
-                "}";
+        String jsonBody = buildJsonStringWithGivenField(fieldToChange,value);
 
         post = updatePost(existingPost,fieldToChange,value);
         testBase.response = RestAssured.given()
@@ -132,18 +136,11 @@ public class CreatePostSteps {
     @Then("the body should have updated post information")
     public void the_body_should_have_updated_post_information() {
         Post updatedPost = testBase.response.getBody().as(Post.class);
-        verifyPost(post,updatedPost);
+
+        System.out.println("SETTING ID OF EXPECTED POST TO MATCH THE ACTUAL ONE");
+        post.setId(updatedPost.getId());
+
+        assertEquals(getJsonNodeFromType(post), getJsonNodeFromType(updatedPost));
     }
-
-
-
-    private void verifyPost(Post expectedPost, Post actualPost){
-
-        assertTrue("UserId doesnt match",expectedPost.getUserId().equalsIgnoreCase(actualPost.getUserId()));
-        assertTrue("Title doesnt match",expectedPost.getTitle().equalsIgnoreCase(actualPost.getTitle()));
-        assertTrue("Body doesnt match",expectedPost.getBody().equalsIgnoreCase(actualPost.getBody()));
-        assertTrue("Id is null",Integer.valueOf(actualPost.getId()) != null);
-    }
-
 
 }
