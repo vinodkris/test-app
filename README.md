@@ -9,6 +9,5 @@ How to run the tests
 2. From TestRunner class
     - Right click and select Run 'TestRunner'
 
-How to view the test results
-Open the results.html file under target directory, open in any browser. 
+To view the test results - Open the results.html file under target directory, open in any browser. 
 
