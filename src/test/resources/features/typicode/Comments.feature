@@ -1,15 +1,16 @@
-Feature: /comments endpoint
+Feature: comments endpoint
   As a user
-  I should be able to access /comments endpoint
+  I should be able to access comments endpoint
   So that I can successfully perform actions on it
 
-  Scenario: Retrieve Comments
+  @get
+  Scenario: Get Comments
     Given The endpoint for comments exist
     When I call the endpoint to retrieve comments
     Then The endpoint should return status of 200
     And I should see the list of comments returned by the endpoint
 
-  @positive
+  @post
   Scenario Outline: Post Comments
     Given The endpoint for comments exist
     When I call the endpoint to post comments with "<postId>" "<name>" "<email>" "<body>"
@@ -21,7 +22,7 @@ Feature: /comments endpoint
       | 2A     | test 02  | test@002.com | test body    |
       |        |          | test@001.com | test body    |
 
-    @put
+  @put
   Scenario Outline: Update Comments
     Given The endpoint for comments exist
     And For an existing comment
@@ -32,7 +33,7 @@ Feature: /comments endpoint
       | postId | name     | email        | body         |
       | 1      | test 01  | test@001.com |  test body   |
 
-      @patch
+  @patch
   Scenario Outline: Partial Update To Comments
     Given The endpoint for comments exist
     And For an existing comment
@@ -43,9 +44,16 @@ Feature: /comments endpoint
       | fieldToChane | value          |
       | name         | test 02        |
 
-        @delete
+  @delete
   Scenario: Delete Comments
     Given The endpoint for comments exist
     When I delete an existing comment
     Then The endpoint should return status of 200
     And I should see an empty body returned by the endpoint
+
+  @noheader @negative
+  Scenario: Create Comments with no header
+    Given The endpoint for comments exist
+    When I call the endpoint to create comment with no header
+    Then The endpoint should return status of 201
+    And The comment should be successfully created with no body but Id

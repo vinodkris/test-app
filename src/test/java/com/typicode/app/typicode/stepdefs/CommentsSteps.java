@@ -2,12 +2,15 @@ package com.typicode.app.typicode.stepdefs;
 
 import com.typicode.app.typicode.base.TestBase;
 import com.typicode.app.typicode.msgType.Comments;
+import com.typicode.app.typicode.msgType.Post;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.typicode.app.typicode.helper.TypicodeHelper.buildPost;
 import static com.typicode.app.typicode.helper.TypicodeHelper.updateComment;
 import static com.typicode.app.typicode.utils.Constants.BASE_URL;
 import static com.typicode.app.typicode.utils.Constants.EMPTY_JSON;
@@ -113,6 +116,26 @@ public class CommentsSteps {
         testBase.response = RestAssured.given()
                 .header("Content-Type", "application/json")
                 .delete(COMMENTS_URL + "/" + existingComment.getId());
+    }
+
+    @When("I call the endpoint to create comment with no header")
+    public void i_call_the_endpoint_to_create_comment_with_no_header() {
+        Comments commentWithNoHeader = new Comments("1","test","test@a.com","Negative test with no header");
+        testBase.response = RestAssured.given()
+                .body(commentWithNoHeader)
+                .post(COMMENTS_URL);
+    }
+    @Then("The comment should be successfully created with no body but Id")
+    public void the_comment_should_be_successfully_created_with_no_body_but_id() {
+
+        Comments withNoBody = testBase.response.body()
+                .as(Comments.class);
+        assertTrue("",withNoBody.getBody() == null);
+        assertTrue("",withNoBody.getPostId() == null);
+        assertTrue("",withNoBody.getEmail() == null);
+        assertTrue("",withNoBody.getName() == null);
+        assertTrue("",withNoBody.getId() != 0);
+
     }
 
     private void verifyComments(Comments expectedComment, Comments actualComments){

@@ -1,20 +1,16 @@
 package com.typicode.app.typicode.stepdefs;
 
 import com.typicode.app.typicode.base.TestBase;
-import com.typicode.app.typicode.msgType.Comments;
 import com.typicode.app.typicode.msgType.Post;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
-import io.restassured.specification.RequestSpecification;
 import java.util.Arrays;
 import java.util.List;
-
 import static com.typicode.app.typicode.helper.TypicodeHelper.*;
 import static com.typicode.app.typicode.utils.Constants.BASE_URL;
-import static io.restassured.RestAssured.*;
 import static org.junit.Assert.*;
 
 /**
@@ -51,11 +47,10 @@ public class CreatePostSteps {
         assertTrue("No Posts returned",!posts.isEmpty());
     }
 
-    @When("I call the endpoint to create post")
+    @When("I call the endpoint to create post with no header")
     public void i_call_the_endpoint_to_create_post() {
-        Post post = buildPost("115","foo","bar");
+        Post post = buildPost("1","No Header","Test For No Header");
         testBase.response = RestAssured.given()
-                .header("Content-Type", "application/json")
                 .body(post)
                 .post(POST_URL);
     }
@@ -78,9 +73,14 @@ public class CreatePostSteps {
         assertTrue("Id is null",Integer.valueOf(post.getId()) != null);
     }
 
-    @And("The post should be successfully created with no body")
-    public void thePostShouldBeSuccessfullyCreatedWithNoBody() {
-        testBase.response.body().toString().isEmpty();
+    @And("The post should be successfully created with no body but Id")
+    public void thePostShouldBeSuccessfullyCreatedWithNoBodyButId() {
+        Post withNoBody = testBase.response.body()
+                .as(Post.class);
+        assertTrue("",withNoBody.getBody() == null);
+        assertTrue("",withNoBody.getTitle() == null);
+        assertTrue("",withNoBody.getUserId() == null);
+        assertTrue("",withNoBody.getId() != 0);
     }
 
     @Given("For an existing post")
@@ -115,8 +115,6 @@ public class CreatePostSteps {
                 .header("Content-Type", "application/json")
                 .body(jsonBody)
                 .patch(POST_URL + "/" + existingPost.getId());
-        System.out.println(testBase.response.getBody().asPrettyString());
-
     }
 
     @When("I delete an existing post")

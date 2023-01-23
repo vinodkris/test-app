@@ -1,15 +1,16 @@
-Feature: Create Post
+Feature: posts endpoint
   As a user
-  I should be able to create post
-  So that I can successfully post
+  I should be able to access posts endpoint
+  So that I can successfully perform actions on it
 
+  @get
   Scenario: Retrieve Posts
     Given The endpoint for post exist
     When I call the endpoint to retrieve posts
     Then The endpoint should return status of 200
     And I should see the list of posts returned by the endpoint
 
-    @postive
+  @post
   Scenario Outline: Create Post
     Given The endpoint for post exist
     When I call the endpoint to create post with "<userId>" "<title>" "<body>"
@@ -21,13 +22,6 @@ Feature: Create Post
         | 2A     | Cold Week             | Freezing... |
         |        | Cold Week             | Freezing... |
         |        |                       |             |
-
-   @noheader
-  Scenario: Create Post
-    Given The endpoint for post exist
-    When I call the endpoint to create post with "01" "No Header" "Headerless>"
-    Then The endpoint should return status of 201
-    And The post should be successfully created with no body
 
   @put
   Scenario Outline: Update Posts
@@ -52,8 +46,15 @@ Feature: Create Post
       | name         | test 02        |
 
   @delete
-  Scenario: Delete Comments
+  Scenario: Delete Posts
     Given The endpoint for post exist
     When I delete an existing post
     Then The endpoint should return status of 200
     And I should see an empty body returned by the endpoint
+
+  @noheader @negative
+  Scenario: Create Post with no header
+    Given The endpoint for post exist
+    When I call the endpoint to create post with no header
+    Then The endpoint should return status of 201
+    And The post should be successfully created with no body but Id

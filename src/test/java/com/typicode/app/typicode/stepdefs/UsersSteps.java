@@ -3,6 +3,7 @@ package com.typicode.app.typicode.stepdefs;
 import com.typicode.app.typicode.base.TestBase;
 import com.typicode.app.typicode.msgType.*;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -11,8 +12,7 @@ import io.restassured.specification.RequestSpecification;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.typicode.app.typicode.helper.TypicodeHelper.updateComment;
-import static com.typicode.app.typicode.helper.TypicodeHelper.updateUser;
+import static com.typicode.app.typicode.helper.TypicodeHelper.*;
 import static com.typicode.app.typicode.utils.Constants.BASE_URL;
 import static io.restassured.RestAssured.when;
 import static org.junit.Assert.assertEquals;
@@ -131,6 +131,27 @@ public class UsersSteps {
         User updatedUser = testBase.response.getBody().as(User.class);
         verifyUser(user,updatedUser);
 
+    }
+
+    @When("I call the endpoint to create user with no header")
+    public void i_call_the_endpoint_to_create_user() {
+        User userWithNoHeader = new User("New test user","updated_tester","test@001.com",
+                "1234567890","www.test123.com",
+                address,company);
+
+        testBase.response = RestAssured.given()
+                .body(userWithNoHeader)
+                .post(USERS_URL);
+    }
+
+    @And("The user should be successfully created with no body but Id")
+    public void theUserShouldBeSuccessfullyCreatedWithNoBodyButId() {
+        User withNoBody = testBase.response.body()
+                .as(User.class);
+        assertTrue("",withNoBody.getUsername() == null);
+        assertTrue("",withNoBody.getEmail() == null);
+        assertTrue("",withNoBody.getAddress() == null);
+        assertTrue("",withNoBody.getId() != 0);
     }
 
     private void verifyUser(User expectedUser, User actualUser){

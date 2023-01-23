@@ -6,7 +6,7 @@ package com.typicode.app.typicode.msgType;
 public class Comments {
 
     private String postId;
-    private String id;
+    private int id;
     private String name;
     private String email;
     private String body;
@@ -28,11 +28,11 @@ public class Comments {
         this.postId = postId;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

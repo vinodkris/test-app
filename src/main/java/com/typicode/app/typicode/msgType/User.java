@@ -5,7 +5,7 @@ package com.typicode.app.typicode.msgType;
  */
 public class User {
 
-    private String id;
+    private int id;
     private String name;
     private String username;
     private String email;
@@ -27,11 +27,11 @@ public class User {
         this.company = company;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
