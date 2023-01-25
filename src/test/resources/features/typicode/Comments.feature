@@ -1,4 +1,5 @@
 Feature: comments endpoint
+
   As a user
   I should be able to access comments endpoint
   So that I can successfully perform actions on it

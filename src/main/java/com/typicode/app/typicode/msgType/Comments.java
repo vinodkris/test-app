@@ -1,8 +1,9 @@
 package com.typicode.app.typicode.msgType;
 
-/**
- * @author Vinod Kris
+/*
+    Object model for Comments
  */
+
 public class Comments {
 
     private int postId;

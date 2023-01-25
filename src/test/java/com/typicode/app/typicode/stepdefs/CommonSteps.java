@@ -2,13 +2,13 @@ package com.typicode.app.typicode.stepdefs;
 
 import com.typicode.app.typicode.base.TestBase;
 import io.cucumber.java.en.Then;
-
 import static com.typicode.app.typicode.utils.Constants.EMPTY_JSON;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Vinod Kris
- */
+/*
+    Class for stepdefs that can be reused across typicode-app endpoints
+*/
+
 public class CommonSteps {
 
     private final TestBase testBase;
@@ -25,10 +25,9 @@ public class CommonSteps {
 
     @Then("I should see an empty body returned by the endpoint")
     public void i_should_see_an_empty_body_returned_by_the_endpoint() {
-        testBase.response.then().log().all();
-        System.out.println(testBase.response.getBody().asString().trim());
-        assertTrue("",testBase.response.getBody().asString().trim().equals(EMPTY_JSON));
 
+        testBase.response.then().log().all();
+        assertTrue("",testBase.response.getBody().asString().trim().equals(EMPTY_JSON));
     }
 
 }

@@ -1,4 +1,5 @@
 Feature: users endpoint
+
   As a user
   I should be able to access users endpoint
   So that I can successfully perform actions on it

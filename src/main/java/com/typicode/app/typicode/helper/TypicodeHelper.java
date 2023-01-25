@@ -7,11 +7,10 @@ import com.typicode.app.typicode.msgType.Comments;
 import com.typicode.app.typicode.msgType.Post;
 import com.typicode.app.typicode.msgType.User;
 
-import static org.junit.Assert.assertEquals;
-
-/**
- * @author Vinod Kris
+/*
+    Helper class for generic/reusable actions
  */
+
 public class TypicodeHelper {
 
     public static Post buildPost(int userId, String title, String body){

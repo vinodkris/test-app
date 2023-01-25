@@ -2,9 +2,10 @@ package com.typicode.app.typicode.msgType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * @author Vinod Kris
+/*
+    Object model for Post
  */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Post {
 

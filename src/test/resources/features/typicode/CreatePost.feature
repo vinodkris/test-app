@@ -1,4 +1,5 @@
 Feature: posts endpoint
+
   As a user
   I should be able to access posts endpoint
   So that I can successfully perform actions on it
@@ -19,7 +20,7 @@ Feature: posts endpoint
       Examples:
         | userId | title                 | body        |
         | 1      | Sundays are relaxing! | Relaxing    |
-        | 2      |                        | Freezing... |
+        | 2      |                        | Freezing...|
         | -3     | Cold Week             |             |
 
   @put
